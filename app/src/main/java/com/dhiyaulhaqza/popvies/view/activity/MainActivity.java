@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
+import android.os.PersistableBundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.dhiyaulhaqza.popvies.R;
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
 import com.dhiyaulhaqza.popvies.config.Const;
 import com.dhiyaulhaqza.popvies.databinding.ActivityMainBinding;
+import com.dhiyaulhaqza.popvies.model.Movie;
 import com.dhiyaulhaqza.popvies.model.Results;
 import com.dhiyaulhaqza.popvies.presenter.MainPresenter;
 import com.dhiyaulhaqza.popvies.presenter.MainView;
@@ -23,26 +25,24 @@ import com.dhiyaulhaqza.popvies.utility.PreferencesUtil;
 import com.dhiyaulhaqza.popvies.view.adapter.AdapterClickHandler;
 import com.dhiyaulhaqza.popvies.view.adapter.MovieAdapter;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity implements MainView {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ActivityMainBinding binding;
-    private String currentSortBy;
     private MainPresenter presenter;
     private MovieAdapter adapter;
     private final AdapterClickHandler clickHandler = new AdapterClickHandler() {
         @Override
         public void onAdapterClickHandler(Results results) {
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable(Const.RESULT, results);
             intent.putExtra(Const.DATA, results);
             startActivity(intent);
         }
     };
+
+    private String currentSortBy;
+    private Movie movie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +55,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
         presenter = new MainPresenter(this);
 
         currentSortBy = PreferencesUtil.readSortMovie(getApplicationContext(), ApiCfg.POPULAR);
-        presenter.fetchMovies(currentSortBy);
+
+        if (savedInstanceState == null) {
+            presenter.fetchMovies(currentSortBy);
+        }
     }
 
     @Override
@@ -86,6 +89,18 @@ public class MainActivity extends AppCompatActivity implements MainView {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(Const.SAVE_INSTANCE, movie);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        addMovies((Movie) savedInstanceState.getParcelable(Const.SAVE_INSTANCE));
     }
 
     private void editSortPref(String sortBy) {
@@ -119,10 +134,15 @@ public class MainActivity extends AppCompatActivity implements MainView {
         });
     }
 
-    @Override
-    public void onResponse(List<Results> resultses) {
+    private void addMovies(Movie movie) {
+        this.movie = movie;
         binding.tvErrorMsg.setVisibility(View.GONE);
-        adapter.addMovies(resultses);
+        adapter.addMovies(movie.getResults());
+    }
+
+    @Override
+    public void onResponse(Movie movie) {
+        addMovies(movie);
     }
 
     @Override

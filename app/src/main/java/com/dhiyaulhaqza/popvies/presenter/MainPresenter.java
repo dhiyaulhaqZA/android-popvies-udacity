@@ -33,7 +33,7 @@ public class MainPresenter {
                 Movie movie = response.body();
                 if (movie != null && movie.getResults() != null) {
                     mainView.onLoading(false);
-                    mainView.onResponse(movie.getResults());
+                    mainView.onResponse(movie);
                 }
             }
 

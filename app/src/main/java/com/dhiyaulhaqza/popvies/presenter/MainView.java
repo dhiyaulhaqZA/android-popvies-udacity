@@ -1,5 +1,6 @@
 package com.dhiyaulhaqza.popvies.presenter;
 
+import com.dhiyaulhaqza.popvies.model.Movie;
 import com.dhiyaulhaqza.popvies.model.Results;
 
 import java.util.List;
@@ -9,7 +10,8 @@ import java.util.List;
  */
 
 public interface MainView {
-    void onResponse(List<Results> resultses);
+//    void onResponse(List<Results> resultses);
+    void onResponse(Movie movie);
 
     void onFailure(String errMsg);
 

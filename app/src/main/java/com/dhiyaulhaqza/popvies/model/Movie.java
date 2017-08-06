@@ -1,12 +1,15 @@
 package com.dhiyaulhaqza.popvies.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
 /**
  * Created by dhiyaulhaqza on 6/19/17.
  */
 
-public class Movie
+public class Movie implements Parcelable
 {
     private List<Results> results;
 
@@ -15,6 +18,25 @@ public class Movie
     private String total_pages;
 
     private String total_results;
+
+    protected Movie(Parcel in) {
+        results = in.createTypedArrayList(Results.CREATOR);
+        page = in.readString();
+        total_pages = in.readString();
+        total_results = in.readString();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     public List<Results> getResults ()
     {
@@ -60,5 +82,18 @@ public class Movie
     public String toString()
     {
         return "ClassPojo [results = "+results+", page = "+page+", total_pages = "+total_pages+", total_results = "+total_results+"]";
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(results);
+        dest.writeString(page);
+        dest.writeString(total_pages);
+        dest.writeString(total_results);
     }
 }
