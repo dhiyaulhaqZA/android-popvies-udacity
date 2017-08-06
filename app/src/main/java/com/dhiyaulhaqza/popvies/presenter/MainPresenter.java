@@ -35,7 +35,6 @@ public class MainPresenter {
                     mainView.onLoading(false);
                     mainView.onResponse(movie.getResults());
                 }
-                Log.d("DEBUG", call.request().url().toString());
             }
 
             @Override

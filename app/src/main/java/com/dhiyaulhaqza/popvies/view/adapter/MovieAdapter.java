@@ -6,6 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.dhiyaulhaqza.popvies.R;
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
 import com.dhiyaulhaqza.popvies.databinding.ItemMovieBinding;
@@ -22,7 +25,6 @@ import java.util.List;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private Context context;
-    private ItemMovieBinding binding;
     private final List<Results> resultsList = new ArrayList<>();
     private final AdapterClickHandler callback;
 
@@ -33,8 +35,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public MovieAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
-        binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_movie, parent, false);
-        return new ViewHolder(binding.getRoot());
+        View view = LayoutInflater.from(context).inflate(R.layout.item_movie, parent, false);
+        return new ViewHolder(view);
     }
 
     public void addMovies(List<Results> results) {
@@ -60,17 +62,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        TextView tvTitle;
+        TextView tvRating;
+        ImageView imgPoster;
+
         public ViewHolder(View itemView) {
             super(itemView);
+            tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
+            tvRating = (TextView) itemView.findViewById(R.id.tv_rating);
+            imgPoster = (ImageView) itemView.findViewById(R.id.img_poster);
             itemView.setOnClickListener(this);
         }
 
         public void bind(int position) {
             Results results = resultsList.get(position);
             if (results != null) {
-                binding.tvTitle.setText(results.getTitle());
-                binding.tvRating.setText(results.getVote_average());
-                PicassoImg.setImage(binding.imgPoster, ApiCfg.BASE_IMG_URL + results.getPoster_path());
+                tvTitle.setText(results.getTitle());
+                tvRating.setText(results.getVote_average());
+                PicassoImg.setImage(imgPoster, ApiCfg.BASE_IMG_URL + results.getPoster_path());
             }
         }
 

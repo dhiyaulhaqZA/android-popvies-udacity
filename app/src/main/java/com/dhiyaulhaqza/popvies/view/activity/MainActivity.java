@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.dhiyaulhaqza.popvies.R;
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
 import com.dhiyaulhaqza.popvies.config.Const;
@@ -124,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public void onResponse(List<Results> resultses) {
         binding.tvErrorMsg.setVisibility(View.GONE);
         adapter.addMovies(resultses);
-        binding.rvMovies.setAdapter(adapter);
     }
 
     @Override
