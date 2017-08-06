@@ -63,11 +63,8 @@ public class DetailActivity extends AppCompatActivity {
     private boolean isHasExtra() {
         Intent intent = getIntent();
         if (intent.hasExtra(Const.DATA)) {
-            Serializable serializable = intent.getBundleExtra(Const.DATA).getSerializable(Const.RESULT);
-            if (serializable != null) {
-                results = (Results) serializable;
-                return true;
-            }
+            results = intent.getParcelableExtra(Const.DATA);
+            return true;
         }
         return false;
     }

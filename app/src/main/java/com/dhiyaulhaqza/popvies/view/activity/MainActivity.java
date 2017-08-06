@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
         @Override
         public void onAdapterClickHandler(Results results) {
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable(Const.RESULT, results);
-            intent.putExtra(Const.DATA, bundle);
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable(Const.RESULT, results);
+            intent.putExtra(Const.DATA, results);
             startActivity(intent);
         }
     };

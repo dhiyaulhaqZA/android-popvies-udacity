@@ -1,13 +1,16 @@
 package com.dhiyaulhaqza.popvies.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 /**
  * Created by dhiyaulhaqza on 6/19/17.
  */
 
-public class Results implements Serializable
+public class Results implements Parcelable
 {
     private String vote_average;
 
@@ -36,6 +39,35 @@ public class Results implements Serializable
     private String video;
 
     private String popularity;
+
+    protected Results(Parcel in) {
+        vote_average = in.readString();
+        backdrop_path = in.readString();
+        adult = in.readString();
+        id = in.readString();
+        title = in.readString();
+        overview = in.readString();
+        original_language = in.readString();
+        genre_ids = in.createStringArray();
+        release_date = in.readString();
+        original_title = in.readString();
+        vote_count = in.readString();
+        poster_path = in.readString();
+        video = in.readString();
+        popularity = in.readString();
+    }
+
+    public static final Creator<Results> CREATOR = new Creator<Results>() {
+        @Override
+        public Results createFromParcel(Parcel in) {
+            return new Results(in);
+        }
+
+        @Override
+        public Results[] newArray(int size) {
+            return new Results[size];
+        }
+    };
 
     public String getVote_average ()
     {
@@ -181,5 +213,28 @@ public class Results implements Serializable
     public String toString()
     {
         return "ClassPojo [vote_average = "+vote_average+", backdrop_path = "+backdrop_path+", adult = "+adult+", id = "+id+", title = "+title+", overview = "+overview+", original_language = "+original_language+", genre_ids = "+genre_ids+", release_date = "+release_date+", original_title = "+original_title+", vote_count = "+vote_count+", poster_path = "+poster_path+", video = "+video+", popularity = "+popularity+"]";
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(vote_average);
+        dest.writeString(backdrop_path);
+        dest.writeString(adult);
+        dest.writeString(id);
+        dest.writeString(title);
+        dest.writeString(overview);
+        dest.writeString(original_language);
+        dest.writeStringArray(genre_ids);
+        dest.writeString(release_date);
+        dest.writeString(original_title);
+        dest.writeString(vote_count);
+        dest.writeString(poster_path);
+        dest.writeString(video);
+        dest.writeString(popularity);
     }
 }
