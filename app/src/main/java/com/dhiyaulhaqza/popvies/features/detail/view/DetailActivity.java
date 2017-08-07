@@ -31,6 +31,7 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
     private static final String TAG = DetailActivity.class.getSimpleName();
     private ActivityDetailBinding binding;
     private MovieResults results;
+    private Trailer trailer;
     private DetailPresenter detailPresenter;
     private TrailerAdapter mAdapter;
     private final TrailerAdapterClickHandler clickHandler = new TrailerAdapterClickHandler() {
@@ -69,9 +70,27 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
 
         writeUi();
 
+        if (savedInstanceState == null) {
+            detailPresenter.fetchTrailers(results.getId());
+            Log.d(TAG, results.getId());
+        }
+    }
 
-        detailPresenter.fetchTrailers(results.getId());
-        Log.d(TAG, results.getId());
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(Const.SAVE_INSTANCE_TRAILER, trailer);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        addTrailers((Trailer) savedInstanceState.getParcelable(Const.SAVE_INSTANCE_TRAILER));
+    }
+
+    private void addTrailers(Trailer trailer) {
+        this.trailer = trailer;
+        mAdapter.addTrailers(trailer.getResults());
     }
 
     private void setupRv() {
@@ -118,7 +137,7 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
 
     @Override
     public void onResponse(Trailer trailer) {
-        mAdapter.addReviews(trailer.getResults());
+        addTrailers(trailer);
     }
 
     @Override

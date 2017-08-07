@@ -45,7 +45,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
         return trailerResults.size();
     }
 
-    public void addReviews(List<TrailerResults> results) {
+    public void addTrailers(List<TrailerResults> results) {
         trailerResults.clear();
         trailerResults.addAll(results);
         notifyDataSetChanged();
