@@ -1,27 +1,45 @@
-package com.dhiyaulhaqza.popvies.view.activity;
+package com.dhiyaulhaqza.popvies.features.detail.view;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.dhiyaulhaqza.popvies.R;
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
 import com.dhiyaulhaqza.popvies.config.Const;
 import com.dhiyaulhaqza.popvies.databinding.ActivityDetailBinding;
-import com.dhiyaulhaqza.popvies.model.Results;
+import com.dhiyaulhaqza.popvies.features.detail.model.Trailer;
+import com.dhiyaulhaqza.popvies.features.detail.model.TrailerResults;
+import com.dhiyaulhaqza.popvies.features.detail.presenter.DetailPresenter;
+import com.dhiyaulhaqza.popvies.features.detail.presenter.DetailView;
+import com.dhiyaulhaqza.popvies.features.home.model.MovieResults;
 import com.dhiyaulhaqza.popvies.utility.PicassoImg;
 
-import java.io.Serializable;
+public class DetailActivity extends AppCompatActivity implements DetailView{
 
-public class DetailActivity extends AppCompatActivity {
-
+    private static final String TAG = DetailActivity.class.getSimpleName();
     private ActivityDetailBinding binding;
-    private Results results;
+    private MovieResults results;
+    private DetailPresenter detailPresenter;
+    private TrailerAdapter mAdapter;
+    private final TrailerAdapterClickHandler clickHandler = new TrailerAdapterClickHandler() {
+        @Override
+        public void onAdapterClickHandler(TrailerResults results) {
+            Intent intent = new Intent(Intent.ACTION_VIEW , Uri.parse(
+                    ApiCfg.BASE_YOUTUBE_WATCH + results.getKey()));
+            startActivity(intent);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +50,9 @@ public class DetailActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        if (isHasExtra())   {
-            writeUi();
-        }
+
+        detailPresenter = new DetailPresenter(this);
+        setupRv();
 
         binding.appbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
@@ -48,6 +66,20 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
+
+        if (!isHasExtra()) return;
+
+        writeUi();
+        detailPresenter.fetchTrailers(results.getId());
+        Log.d(TAG, results.getId());
+    }
+
+    private void setupRv() {
+        binding.rvDetailTrailer.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        binding.rvDetailTrailer.setLayoutManager(layoutManager);
+        mAdapter = new TrailerAdapter(clickHandler);
+        binding.rvDetailTrailer.setAdapter(mAdapter);
     }
 
     private void writeUi() {
@@ -76,5 +108,28 @@ public class DetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResponse(Trailer trailer) {
+        mAdapter.addReviews(trailer.getResults());
+    }
+
+    @Override
+    public void onFailure(String errMsg) {
+        Log.e(TAG, errMsg);
+    }
+
+    @Override
+    public void onLoading(boolean isLoading) {
+        int visibility;
+        if (isLoading) {
+            visibility = View.GONE;
+        } else {
+            visibility = View.VISIBLE;
+        }
+
+        binding.tvTrailerLabel.setVisibility(visibility);
+        binding.rvDetailTrailer.setVisibility(visibility);
     }
 }

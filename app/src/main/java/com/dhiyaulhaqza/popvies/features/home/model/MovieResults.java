@@ -1,16 +1,14 @@
-package com.dhiyaulhaqza.popvies.model;
+package com.dhiyaulhaqza.popvies.features.home.model;
 
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
  * Created by dhiyaulhaqza on 6/19/17.
  */
 
-public class Results implements Parcelable
+public class MovieResults implements Parcelable
 {
     private String vote_average;
 
@@ -40,7 +38,7 @@ public class Results implements Parcelable
 
     private String popularity;
 
-    protected Results(Parcel in) {
+    protected MovieResults(Parcel in) {
         vote_average = in.readString();
         backdrop_path = in.readString();
         adult = in.readString();
@@ -57,15 +55,15 @@ public class Results implements Parcelable
         popularity = in.readString();
     }
 
-    public static final Creator<Results> CREATOR = new Creator<Results>() {
+    public static final Creator<MovieResults> CREATOR = new Creator<MovieResults>() {
         @Override
-        public Results createFromParcel(Parcel in) {
-            return new Results(in);
+        public MovieResults createFromParcel(Parcel in) {
+            return new MovieResults(in);
         }
 
         @Override
-        public Results[] newArray(int size) {
-            return new Results[size];
+        public MovieResults[] newArray(int size) {
+            return new MovieResults[size];
         }
     };
 

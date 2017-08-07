@@ -1,9 +1,9 @@
-package com.dhiyaulhaqza.popvies.presenter;
+package com.dhiyaulhaqza.popvies.features.home.presenter;
 
 import android.util.Log;
 
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
-import com.dhiyaulhaqza.popvies.model.Movie;
+import com.dhiyaulhaqza.popvies.features.home.model.Movie;
 import com.dhiyaulhaqza.popvies.rest.ApiClient;
 import com.dhiyaulhaqza.popvies.rest.ApiService;
 
@@ -34,6 +34,7 @@ public class MainPresenter {
                 if (movie != null && movie.getResults() != null) {
                     mainView.onLoading(false);
                     mainView.onResponse(movie);
+                    Log.d("DEBUG", response.raw().request().toString());
                 }
             }
 

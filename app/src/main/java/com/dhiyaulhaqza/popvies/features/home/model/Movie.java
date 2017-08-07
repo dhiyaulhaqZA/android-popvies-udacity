@@ -1,4 +1,4 @@
-package com.dhiyaulhaqza.popvies.model;
+package com.dhiyaulhaqza.popvies.features.home.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Movie implements Parcelable
 {
-    private List<Results> results;
+    private List<MovieResults> results;
 
     private String page;
 
@@ -20,7 +20,7 @@ public class Movie implements Parcelable
     private String total_results;
 
     protected Movie(Parcel in) {
-        results = in.createTypedArrayList(Results.CREATOR);
+        results = in.createTypedArrayList(MovieResults.CREATOR);
         page = in.readString();
         total_pages = in.readString();
         total_results = in.readString();
@@ -38,12 +38,12 @@ public class Movie implements Parcelable
         }
     };
 
-    public List<Results> getResults ()
+    public List<MovieResults> getResults ()
     {
         return results;
     }
 
-    public void setResults (List<Results> results)
+    public void setResults (List<MovieResults> results)
     {
         this.results = results;
     }

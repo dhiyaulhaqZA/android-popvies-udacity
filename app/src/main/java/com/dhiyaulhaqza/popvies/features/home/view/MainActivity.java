@@ -1,10 +1,9 @@
-package com.dhiyaulhaqza.popvies.view.activity;
+package com.dhiyaulhaqza.popvies.features.home.view;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
-import android.os.PersistableBundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,13 +16,12 @@ import com.dhiyaulhaqza.popvies.R;
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
 import com.dhiyaulhaqza.popvies.config.Const;
 import com.dhiyaulhaqza.popvies.databinding.ActivityMainBinding;
-import com.dhiyaulhaqza.popvies.model.Movie;
-import com.dhiyaulhaqza.popvies.model.Results;
-import com.dhiyaulhaqza.popvies.presenter.MainPresenter;
-import com.dhiyaulhaqza.popvies.presenter.MainView;
+import com.dhiyaulhaqza.popvies.features.home.model.Movie;
+import com.dhiyaulhaqza.popvies.features.home.model.MovieResults;
+import com.dhiyaulhaqza.popvies.features.home.presenter.MainPresenter;
+import com.dhiyaulhaqza.popvies.features.home.presenter.MainView;
 import com.dhiyaulhaqza.popvies.utility.PreferencesUtil;
-import com.dhiyaulhaqza.popvies.view.adapter.AdapterClickHandler;
-import com.dhiyaulhaqza.popvies.view.adapter.MovieAdapter;
+import com.dhiyaulhaqza.popvies.features.detail.view.DetailActivity;
 
 public class MainActivity extends AppCompatActivity implements MainView {
 
@@ -31,10 +29,11 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     private ActivityMainBinding binding;
     private MainPresenter presenter;
+
     private MovieAdapter adapter;
-    private final AdapterClickHandler clickHandler = new AdapterClickHandler() {
+    private final MovieAdapterClickHandler clickHandler = new MovieAdapterClickHandler() {
         @Override
-        public void onAdapterClickHandler(Results results) {
+        public void onAdapterClickHandler(MovieResults results) {
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
             intent.putExtra(Const.DATA, results);
             startActivity(intent);
@@ -48,12 +47,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
         setSupportActionBar(binding.toolbar);
         setTitle(R.string.app_name);
         setupRv();
         setupSwipeRefresh();
         presenter = new MainPresenter(this);
-
         currentSortBy = PreferencesUtil.readSortMovie(getApplicationContext(), ApiCfg.POPULAR);
 
         if (savedInstanceState == null) {

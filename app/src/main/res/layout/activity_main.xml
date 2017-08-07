@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:context="com.dhiyaulhaqza.popvies.view.activity.MainActivity">
+            tools:context="com.dhiyaulhaqza.popvies.features.home.view.MainActivity">
 
             <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/swipe_refresh_movie"

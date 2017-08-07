@@ -4,4 +4,7 @@
     <string name="popular_movies">Popular Movies</string>
     <string name="top_rated_movies">Top Rated Movies</string>
     <string name="error_msg">Oops, An error occurred</string>
+    <string name="trailers_label">Trailers:</string>
+    <string name="icon_trailer_content_description">Icon Trailer</string>
+    <string name="str_trailer">Trailer</string>
 </resources>
