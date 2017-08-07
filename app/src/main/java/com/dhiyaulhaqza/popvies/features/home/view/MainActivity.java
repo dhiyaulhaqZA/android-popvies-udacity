@@ -93,13 +93,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(Const.SAVE_INSTANCE, movie);
+        outState.putParcelable(Const.SAVE_INSTANCE_HOME, movie);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        addMovies((Movie) savedInstanceState.getParcelable(Const.SAVE_INSTANCE));
+        addMovies((Movie) savedInstanceState.getParcelable(Const.SAVE_INSTANCE_HOME));
     }
 
     private void editSortPref(String sortBy) {

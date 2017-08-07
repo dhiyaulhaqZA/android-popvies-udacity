@@ -23,6 +23,7 @@ import com.dhiyaulhaqza.popvies.features.detail.model.TrailerResults;
 import com.dhiyaulhaqza.popvies.features.detail.presenter.DetailPresenter;
 import com.dhiyaulhaqza.popvies.features.detail.presenter.DetailView;
 import com.dhiyaulhaqza.popvies.features.home.model.MovieResults;
+import com.dhiyaulhaqza.popvies.features.review.view.ReviewActivity;
 import com.dhiyaulhaqza.popvies.utility.PicassoImg;
 
 public class DetailActivity extends AppCompatActivity implements DetailView{
@@ -50,10 +51,8 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        detailPresenter = new DetailPresenter(this);
         setupRv();
-
+        detailPresenter = new DetailPresenter(this);
         binding.appbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -66,10 +65,11 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
                 }
             }
         });
-
         if (!isHasExtra()) return;
 
         writeUi();
+
+
         detailPresenter.fetchTrailers(results.getId());
         Log.d(TAG, results.getId());
     }
@@ -99,6 +99,12 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
             return true;
         }
         return false;
+    }
+
+    public void readReviews(View view) {
+        Intent intent = new Intent(this, ReviewActivity.class);
+        intent.putExtra(Const.MOVIE_EXTRA, results);
+        startActivity(intent);
     }
 
     @Override

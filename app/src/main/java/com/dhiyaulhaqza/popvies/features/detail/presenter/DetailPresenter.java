@@ -1,5 +1,7 @@
 package com.dhiyaulhaqza.popvies.features.detail.presenter;
 
+import android.util.Log;
+
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
 import com.dhiyaulhaqza.popvies.features.detail.model.Trailer;
 import com.dhiyaulhaqza.popvies.rest.ApiClient;
@@ -31,6 +33,7 @@ public class DetailPresenter {
                 if (trailer != null && trailer.getResults() != null) {
                     mDetailView.onLoading(false);
                     mDetailView.onResponse(trailer);
+                    Log.d("DEBUG", response.raw().request().toString());
                 }
             }
 

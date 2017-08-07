@@ -117,6 +117,17 @@
                         android:layout_height="wrap_content"
                         tool:text="Synopsis" />
 
+                    <TextView
+                        android:id="@+id/tv_read_reviews"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:onClick="readReviews"
+                        android:padding="8dp"
+                        android:text="@string/read_reviews_label"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="18sp" />
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -141,6 +152,5 @@
             </RelativeLayout>
 
         </android.support.v4.widget.NestedScrollView>
-
     </android.support.design.widget.CoordinatorLayout>
 </layout>

@@ -2,6 +2,7 @@ package com.dhiyaulhaqza.popvies.rest;
 
 import com.dhiyaulhaqza.popvies.features.home.model.Movie;
 import com.dhiyaulhaqza.popvies.features.detail.model.Trailer;
+import com.dhiyaulhaqza.popvies.features.review.model.Review;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -21,9 +22,9 @@ public interface ApiService {
     Call<Trailer> getMovieTrailer(@Path("movie_id") String movieId,
                                   @Query("api_key") String apiKey);
 
-//    @GET("movie/{movie_id}/reviews")
-//    Call<Reviews> getMovieReviews(@Path("movie_id") String movieId,
-//                                  @Query("api_key") String apiKey);
+    @GET("movie/{movie_id}/reviews")
+    Call<Review> getMovieReviews(@Path("movie_id") String movieId,
+                                 @Query("api_key") String apiKey);
 
     // COMPLETED: TASK(1) Buat trailer recyclerview dan custom itemnya
     // COMPLETED: TASK(2) Buat model trailer
