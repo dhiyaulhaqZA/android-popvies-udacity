@@ -190,6 +190,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
             public void onRefresh() {
                 if (!currentSortBy.equals(ApiCfg.FAVORITE)) {
                     presenter.fetchMovies(currentSortBy);
+                } else {
+                    binding.swipeRefreshMovie.setRefreshing(false);
                 }
             }
         });

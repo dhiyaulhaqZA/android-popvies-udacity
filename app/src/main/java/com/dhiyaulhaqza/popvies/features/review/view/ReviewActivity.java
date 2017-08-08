@@ -60,7 +60,10 @@ public class ReviewActivity extends AppCompatActivity implements ReviewView {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        addReviews((Review) savedInstanceState.getParcelable(Const.SAVE_INSTANCE_REVIEW));
+        Review r = savedInstanceState.getParcelable(Const.SAVE_INSTANCE_REVIEW);
+        if (r != null) {
+            addReviews(r);
+        }
     }
 
     @Override
