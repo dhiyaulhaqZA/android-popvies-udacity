@@ -3,7 +3,12 @@ package com.dhiyaulhaqza.popvies.features.home.view;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +20,8 @@ import android.view.View;
 import com.dhiyaulhaqza.popvies.R;
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
 import com.dhiyaulhaqza.popvies.config.Const;
+import com.dhiyaulhaqza.popvies.data.MovieContract;
+import com.dhiyaulhaqza.popvies.data.MovieDbManager;
 import com.dhiyaulhaqza.popvies.databinding.ActivityMainBinding;
 import com.dhiyaulhaqza.popvies.features.home.model.Movie;
 import com.dhiyaulhaqza.popvies.features.home.model.MovieResults;
@@ -23,25 +30,36 @@ import com.dhiyaulhaqza.popvies.features.home.presenter.MainView;
 import com.dhiyaulhaqza.popvies.utility.PreferencesUtil;
 import com.dhiyaulhaqza.popvies.features.detail.view.DetailActivity;
 
-public class MainActivity extends AppCompatActivity implements MainView {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements MainView,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int MOVIE_LOADER_ID = 0;
+    private Uri mUri;
 
     private ActivityMainBinding binding;
     private MainPresenter presenter;
-
+    private MovieResults mMovieResults;
     private MovieAdapter adapter;
     private final MovieAdapterClickHandler clickHandler = new MovieAdapterClickHandler() {
         @Override
         public void onAdapterClickHandler(MovieResults results) {
-            Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-            intent.putExtra(Const.DATA, results);
-            startActivity(intent);
+            if (currentSortBy.equals(ApiCfg.FAVORITE)) {
+                openDetail(true, results);
+            } else {
+                mMovieResults = results;
+                mUri = MovieContract.MovieEntry.CONTENT_URI;
+                mUri = mUri.buildUpon().appendPath(results.getId()).build();
+                getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, MainActivity.this);
+                Log.d(TAG, "Uri : " + mUri.toString());
+            }
         }
     };
 
     private String currentSortBy;
-    private Movie movie;
+    private Movie mMovie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +73,21 @@ public class MainActivity extends AppCompatActivity implements MainView {
         presenter = new MainPresenter(this);
         currentSortBy = PreferencesUtil.readSortMovie(getApplicationContext(), ApiCfg.POPULAR);
 
+        mUri = MovieContract.MovieEntry.CONTENT_URI;
         if (savedInstanceState == null) {
-            presenter.fetchMovies(currentSortBy);
+            if (currentSortBy.equals(ApiCfg.FAVORITE)) { //sis null && favorite
+                getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+            } else { //sis null && !favorite
+                presenter.fetchMovies(currentSortBy);
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (currentSortBy.equals(ApiCfg.FAVORITE)) {
+            getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
         }
     }
 
@@ -67,8 +98,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
         MenuItem menuItem;
         if (currentSortBy.equals(ApiCfg.POPULAR)) {
             menuItem = menu.findItem(R.id.action_popular);
-        } else {
+        } else if (currentSortBy.equals(ApiCfg.TOP_RATED)){
             menuItem = menu.findItem(R.id.action_top_rated);
+        } else {
+            menuItem = menu.findItem(R.id.action_favorite);
         }
         menuItem.setChecked(true);
         return super.onCreateOptionsMenu(menu);
@@ -78,12 +111,16 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         item.setChecked(true);
+        binding.tvErrorMsg.setVisibility(View.GONE);
         switch (id) {
             case R.id.action_popular:
                 editSortPref(ApiCfg.POPULAR);
                 return true;
             case R.id.action_top_rated:
                 editSortPref(ApiCfg.TOP_RATED);
+                return true;
+            case R.id.action_favorite:
+                editSortPref(ApiCfg.FAVORITE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -93,20 +130,43 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(Const.SAVE_INSTANCE_HOME, movie);
+        outState.putParcelable(Const.SAVE_INSTANCE_HOME, mMovie);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        addMovies((Movie) savedInstanceState.getParcelable(Const.SAVE_INSTANCE_HOME));
+        Movie movie = savedInstanceState.getParcelable(Const.SAVE_INSTANCE_HOME);
+        if (movie != null) {
+            addMovies(movie);
+        }
     }
 
     private void editSortPref(String sortBy) {
         Context context = getApplicationContext();
         PreferencesUtil.writeSortMovie(context, sortBy);
         currentSortBy = PreferencesUtil.readSortMovie(context, sortBy);
-        presenter.fetchMovies(currentSortBy);
+        if (!currentSortBy.equals(ApiCfg.FAVORITE)) {
+            getSupportLoaderManager().destroyLoader(MOVIE_LOADER_ID);
+            presenter.fetchMovies(currentSortBy);
+        } else {
+            mUri = MovieContract.MovieEntry.CONTENT_URI;
+            getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
+        }
+    }
+
+    private void openDetail(boolean isFavorite, MovieResults results) {
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        intent.putExtra(Const.DATA, results);
+        intent.putExtra(Const.IS_FAVORITE, isFavorite);
+        startActivity(intent);
+        getSupportLoaderManager().destroyLoader(MOVIE_LOADER_ID);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getSupportLoaderManager().destroyLoader(MOVIE_LOADER_ID);
     }
 
     private void setupRv() {
@@ -128,13 +188,15 @@ public class MainActivity extends AppCompatActivity implements MainView {
         binding.swipeRefreshMovie.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                presenter.fetchMovies(currentSortBy);
+                if (!currentSortBy.equals(ApiCfg.FAVORITE)) {
+                    presenter.fetchMovies(currentSortBy);
+                }
             }
         });
     }
 
     private void addMovies(Movie movie) {
-        this.movie = movie;
+        mMovie = movie;
         binding.tvErrorMsg.setVisibility(View.GONE);
         adapter.addMovies(movie.getResults());
     }
@@ -168,5 +230,68 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 binding.pbLoading.setVisibility(View.GONE);
                 binding.rvMovies.setVisibility(View.VISIBLE);
             }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<Cursor>(this) {
+
+            Cursor mMovieData = null;
+
+            @Override
+            protected void onStartLoading() {
+                if (mMovieData != null) {
+                    deliverResult(mMovieData);
+                } else {
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public Cursor loadInBackground() {
+                try {
+                    return getContentResolver().query(mUri,
+                            null,
+                            null,
+                            null,
+                            null);
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to asynchronously load data.");
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public void deliverResult(Cursor data) {
+                mMovieData = data;
+                super.deliverResult(data);
+
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        List<MovieResults> movieResults = MovieDbManager.readFavoriteMovies(data);
+        boolean isSortedByFavorite = currentSortBy.equals(ApiCfg.FAVORITE);
+        if (isSortedByFavorite) {
+            adapter.addMovies(movieResults);
+            mMovie = new Movie();
+            mMovie.setResults(movieResults);
+            if (movieResults.size() < 1) {
+                binding.tvErrorMsg.setVisibility(View.VISIBLE);
+            } else {
+                binding.tvErrorMsg.setVisibility(View.GONE);
+            }
+        } else {
+            boolean size = movieResults.size() == 1;
+            openDetail(size, mMovieResults);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 }

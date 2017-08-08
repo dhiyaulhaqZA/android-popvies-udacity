@@ -2,8 +2,10 @@ package com.dhiyaulhaqza.popvies.features.detail.view;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,7 @@ import android.view.View;
 import com.dhiyaulhaqza.popvies.R;
 import com.dhiyaulhaqza.popvies.config.ApiCfg;
 import com.dhiyaulhaqza.popvies.config.Const;
+import com.dhiyaulhaqza.popvies.data.MovieDbManager;
 import com.dhiyaulhaqza.popvies.databinding.ActivityDetailBinding;
 import com.dhiyaulhaqza.popvies.features.detail.model.Trailer;
 import com.dhiyaulhaqza.popvies.features.detail.model.TrailerResults;
@@ -25,6 +28,7 @@ import com.dhiyaulhaqza.popvies.features.detail.presenter.DetailView;
 import com.dhiyaulhaqza.popvies.features.home.model.MovieResults;
 import com.dhiyaulhaqza.popvies.features.review.view.ReviewActivity;
 import com.dhiyaulhaqza.popvies.utility.PicassoImg;
+import com.dhiyaulhaqza.popvies.utility.PreferencesUtil;
 
 public class DetailActivity extends AppCompatActivity implements DetailView{
 
@@ -34,6 +38,7 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
     private Trailer trailer;
     private DetailPresenter detailPresenter;
     private TrailerAdapter mAdapter;
+    private boolean isFavorite;
     private final TrailerAdapterClickHandler clickHandler = new TrailerAdapterClickHandler() {
         @Override
         public void onAdapterClickHandler(TrailerResults results) {
@@ -69,11 +74,25 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
         if (!isHasExtra()) return;
 
         writeUi();
+        setAsFavoriteMovie(isFavorite);
 
         if (savedInstanceState == null) {
             detailPresenter.fetchTrailers(results.getId());
             Log.d(TAG, results.getId());
         }
+    }
+
+    private void setAsFavoriteMovie(boolean isFavorite) {
+        int imageResourceId;
+        if (isFavorite) {
+            imageResourceId = R.drawable.ic_favorite_red_500_24dp;
+            MovieDbManager.insertFavoriteMovie(this, results);
+        } else {
+            imageResourceId = R.drawable.ic_favorite_red_200_24dp;
+            MovieDbManager.deleteFavoritedMovie(this, results.getId());
+        }
+
+        binding.imgFavorite.setImageDrawable(ContextCompat.getDrawable(this, imageResourceId));
     }
 
     @Override
@@ -113,8 +132,9 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
 
     private boolean isHasExtra() {
         Intent intent = getIntent();
-        if (intent.hasExtra(Const.DATA)) {
+        if (intent.hasExtra(Const.DATA) && intent.hasExtra(Const.IS_FAVORITE)) {
             results = intent.getParcelableExtra(Const.DATA);
+            isFavorite = intent.getBooleanExtra(Const.IS_FAVORITE, false);
             return true;
         }
         return false;
@@ -124,6 +144,11 @@ public class DetailActivity extends AppCompatActivity implements DetailView{
         Intent intent = new Intent(this, ReviewActivity.class);
         intent.putExtra(Const.MOVIE_EXTRA, results);
         startActivity(intent);
+    }
+
+    public void onFavoriteClick(View view) {
+        isFavorite = !isFavorite;
+        setAsFavoriteMovie(isFavorite);
     }
 
     @Override

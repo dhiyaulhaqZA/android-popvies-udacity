@@ -88,6 +88,11 @@ public class ReviewActivity extends AppCompatActivity implements ReviewView {
     @Override
     public void onResponse(Review review) {
         addReviews(review);
+        if (review.getResults().size() > 0) {
+            mBinding.tvEmptyReview.setVisibility(View.GONE);
+        } else {
+            mBinding.tvEmptyReview.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

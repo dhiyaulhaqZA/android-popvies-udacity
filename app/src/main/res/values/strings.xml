@@ -3,9 +3,14 @@
     <string name="image_content_description">Poster Image</string>
     <string name="popular_movies">Popular Movies</string>
     <string name="top_rated_movies">Top Rated Movies</string>
-    <string name="error_msg">Oops, An error occurred</string>
+    <string name="favorite_movies">Favorite Movies</string>
+    <string name="error_msg">No data can be displayed</string>
     <string name="trailers_label">Trailers:</string>
     <string name="icon_trailer_content_description">Icon Trailer</string>
     <string name="str_trailer">Trailer</string>
     <string name="read_reviews_label">Read Reviews</string>
+    <string name="content_description_favorite">Favorite</string>
+    <string name="str_empty_review">There are no reviews in this movie.</string>
+    <string name="str_favorite">Favorite</string>
+    <string name="content_authority">com.dhiyaulhaqza.popvies</string>
 </resources>

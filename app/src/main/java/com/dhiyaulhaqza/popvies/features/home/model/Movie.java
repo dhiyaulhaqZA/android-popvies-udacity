@@ -19,6 +19,9 @@ public class Movie implements Parcelable
 
     private String total_results;
 
+    public Movie() {
+    }
+
     protected Movie(Parcel in) {
         results = in.createTypedArrayList(MovieResults.CREATOR);
         page = in.readString();

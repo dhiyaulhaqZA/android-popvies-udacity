@@ -38,6 +38,10 @@ public class MovieResults implements Parcelable
 
     private String popularity;
 
+    public MovieResults() {
+
+    }
+
     protected MovieResults(Parcel in) {
         vote_average = in.readString();
         backdrop_path = in.readString();
